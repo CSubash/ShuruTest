@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-
 namespace TestApp.Models
 {
     public class SurveyResponse

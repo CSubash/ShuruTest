@@ -1,9 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using System.Threading.Tasks;
-using System;
 using TestApp.Data;
 using TestApp.Models;
 
@@ -68,18 +64,34 @@ public class SurveyController : ControllerBase
         return Ok(response);
     }
 
-    [HttpPut("responses/{responseId}")]
-    public async Task<IActionResult> UpdateResponse(int responseId, [FromBody] SurveyResponse updated)
+    [HttpPost("responses/{responseId}/edit")]
+    public async Task<IActionResult> EditResponse(int responseId, [FromBody] SurveyResponse updated)
     {
-        var response = await _context.SurveyResponses.FindAsync(responseId);
-        if (response == null) return NotFound();
+        var original = await _context.SurveyResponses
+            .Include(r => r.Answers)
+            .FirstOrDefaultAsync(r => r.Id == responseId);
+        if (original == null) return NotFound();
 
-        response.Answers = updated.Answers;
-        response.UpdatedAt = DateTime.UtcNow;
-        response.Version += 1;
-
+        var newResponse = new SurveyResponse
+        {
+            SurveyId = original.SurveyId,
+            UserId = original.UserId,
+            Version = original.Version + 1,
+            SubmittedAt = original.SubmittedAt,
+            UpdatedAt = DateTime.UtcNow,
+            Answers = updated.Answers
+        };
+        _context.SurveyResponses.Add(newResponse);
         await _context.SaveChangesAsync();
-        return Ok(response);
+
+        foreach (var ans in newResponse.Answers)
+        {
+            ans.SurveyResponseId = newResponse.Id;
+            _context.SurveyResponseAnswers.Add(ans);
+        }
+        await _context.SaveChangesAsync();
+
+        return Ok(newResponse);
     }
 
     [HttpGet("user/{userId}/responses")]
