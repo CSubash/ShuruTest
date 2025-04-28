@@ -1,0 +1,22 @@
+# Ignore Visual Studio files
+.vs/
+.vscode/
+# User-specific files
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+# Windows Installer files
+*.cab
+*.msi
+*.msm
+*.msp
+# Build results
+bin/
+obj/
+# User-specific files
+*.swp
+*.swo
+# .NET Core
+project.lock.json
+project.fragment.lock.json
