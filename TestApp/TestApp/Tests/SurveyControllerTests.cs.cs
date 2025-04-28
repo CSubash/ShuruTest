@@ -22,7 +22,13 @@ public class SurveyControllerTests
         var context = GetDbContext();
         var controller = new SurveyController(context);
 
-        var question = new SurveyQuestion { SurveyId = 1, QuestionText = "Test?", QuestionType = "text" };
+        var question = new SurveyQuestion
+        {
+            SurveyId = 1,
+            QuestionText = "Test?",
+            QuestionType = "text"
+        };
+
         var result = await controller.CreateQuestion(question);
 
         Assert.IsType<OkObjectResult>(result);
